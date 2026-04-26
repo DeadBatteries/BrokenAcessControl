@@ -1,0 +1,90 @@
+Estudo Documentado:
+
+    Estou a um tempo estruturando meu código com Express, mil vezes mais rápido do que Node puro (apesar de achar que a noção
+    do node puro também é extremamente importante)
+
+    Li a documentação do express sobre middlewares e utilização do next() e a comodidade que o framework entrega ,
+    torna o processo de routing descomplicado, fácil e ágil. Com certeza utilizarei mais o framework em meus projetos.
+
+    Exemplo Express:
+
+        const express = require("express");
+        const app = express();
+        
+
+        app.method(rota, middleware, controller) (ou req,res)
+
+        app é o server express.
+        method é o metódo http ("get", "post", put"...)
+
+        Express também cria a função next() automaticamente então podemos estruturar o fluxo do nosso código de maneira
+        simples.
+
+    Vulnerabilidade na Query:
+
+
+        *Código propositalmente vulnerável*
+
+
+        URL: 
+
+            /admin/users?user=joao
+
+         middleware:
+
+            auth(req, res, next){
+
+                const user = req.query.user;   (?user=joao);
+
+                if(!user){
+
+                    res.end(...);
+
+                 }else{
+
+                 req.user = user;
+                next();
+
+                 }
+                return;
+
+                };
+
+            *O middleware acima não autentica, ele apenas repassa o input*
+
+         Por quê esse middleware é vulnerável? Simples, esse middleware não faz uma validação real da permissão do usuário,
+         ele simplesmente pega o paramêtro user da query (que é controlado pelo cliente) e valida baseado nisso, ou seja,
+         o sistema não realiza autenticação(verificação de identidade), ele trata input do cliente como fonte da verdade para autorização.
+        Então qualquer um que fizer ?user=admin consegue acesso de admin ao site. 
+
+         o controller faz isso:
+
+             if(req.user!=="admin"){
+            res.end(...);
+            }
+            ...
+
+
+        Esse tipo de vulnerabilidade é conhecida como Broken Acess Control, pois o sistema confia em um paramêtro controlado pelo
+        cliente para definir privilégios.
+
+    Por quê esse tipo de vulnerabilide quebra o modelo de segurança?
+
+
+        Violação de Trust-Boundary
+
+        Simples, o server-side nunca deve confiar em dados enviados pelo client-side para autenticações ou verificações
+        de autenticidade. Informações recebidas pelo client-side são altamente manipuláveis e caso sejam tratadas como "fonte da verdade"
+        COM TODA CERTEZA, seu código estará vulnerável.
+
+        Explicando melhor:
+
+        Client-side: não confiável
+        Server-side: fonte da verdade
+        Caso atual: server terceira a verdade do cliente
+
+    
+
+
+   
+
