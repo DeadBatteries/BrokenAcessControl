@@ -83,6 +83,54 @@ Estudo Documentado:
         Server-side: fonte da verdade
         Caso atual: server terceira a verdade do cliente
 
+
+
+28/04
+
+
+    Implementei uma rota protegida (proteção simulada, ainda vulneravel por confiar no input do cliente),  /admin/users que 
+    faz a verificação baseada em nome. E uma rota desprotegida /api/users, o objetivo é entender que um atacante consegue acessar
+    os dados mesmo que uma rota esteja protegida, caso outra que acesse os mesmos dados não esteja.
+
+    Exemplo:
+
+    Usuário acessa http://localhost:3000/admin/users/?user= e o sistema realiza a verificação baseada em um
+    identificador controlado pelo cliente (Inseguro!)
+
+    Agora supondo que essa rota esta "protegida" o atacante consegue acesso ao array users, ja que há uma 
+    rota desprotegida/endpoint sem controle de acesso
+
+    que retorna os mesmos paramêtros. No caso:
+
+    http:localhost:3000/api/users
+
+    Essa rota não possui é totalmente aberta e consegue ser acessada sem nenhum tipo de validação
+
+    Por quê essa falha é perigosa?
+
+    1 - O sistema parece seguro?
+
+    O sistema aparenta estar protegido ao analisar apenas o endpoint principal (/admin/users).
+    No entanto, a existência de um endpoint secundário sem controle de acesso (/api/users) expõe
+     o mesmo recurso, tornando a proteção ineficaz.
+
+    2 - Por que desenvolvedores não percebem isso?
+
+    Desenvolvedores frequentemente aplicam controle de acesso de forma pontual, assumindo que proteger endpoints críticos é suficiente.
+    Porém, a falta de consistência na aplicação dessas regras permite que rotas secundárias exponham os mesmos dados sem proteção.
+
+
+    3 - Qual impacto em produção?
+
+    A falha permite acesso não autorizado a dados  sensíveis, podendo levar a exposição de informações internas, 
+    escalonamento de privilégios e comprometimento da aplicação.
+
+    4 - Como corrigir 
+
+    A correção envolve garantir que o controle de acesso seja aplicado de forma consistente em todos os endpoints que expõem 
+    dados sensíveis. Além disso, a identidade do usuário deve ser validada no servidor (ex: sessão ou token), sem confiar em dados
+    fornecidos pelo cliente.
+
     
 
 

@@ -1,7 +1,9 @@
 import { auth } from "./middlewares/auth.js";
 import { adminHandler } from "./handlers/adminController.js";
 import express from "express";
+import { users } from "./storage/users.js";
 
+import { sendJson } from "./utils/sendJson.js";
 const app = express();
 const port = 3000; 
 
@@ -18,8 +20,14 @@ app.get("/public", (req,res)=>{
 });
 
 
-app.get("/admin", auth, adminHandler);
+app.get("/admin/users", auth, adminHandler);
 
+app.get("/api/users",(req,res)=>{
+
+    console.log("Acess /api/users")
+    return sendJson(res,200,users);
+
+});
 
 app.listen(port, ()=>{
 
